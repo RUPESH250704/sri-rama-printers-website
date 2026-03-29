@@ -7,11 +7,40 @@ require('dotenv').config();
 
 const app = express();
 
+const extraAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const isAllowedVercelOrigin = (origin) => {
+  try {
+    const parsed = new URL(origin);
+    return parsed.protocol === 'https:' && parsed.hostname.endsWith('.vercel.app');
+  } catch (error) {
+    return false;
+  }
+};
+
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-url.vercel.app', 'https://*.vercel.app']
-    : ['http://localhost:3000'],
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    const devOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
+    if (isDevelopment && devOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    if (extraAllowedOrigins.includes(origin) || isAllowedVercelOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json());

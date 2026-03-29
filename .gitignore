@@ -16,6 +16,7 @@ backend/.env
 backend/.env.*
 frontend/.env
 frontend/.env.*
+myenv
 
 # Logs
 *.log
