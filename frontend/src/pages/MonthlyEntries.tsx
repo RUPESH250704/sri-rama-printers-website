@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { shopsAPI } from '../services/api';
 
 const MonthlyEntries: React.FC = () => {
@@ -7,11 +7,7 @@ const MonthlyEntries: React.FC = () => {
   const [month, setMonth] = useState(0);
   const [year, setYear] = useState(0);
 
-  useEffect(() => {
-    fetchEntries();
-  }, [selectedShop]);
-
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async () => {
     try {
       const response = await shopsAPI.getThisMonthEntries(selectedShop);
       setEntries(response.data.entries);
@@ -20,7 +16,11 @@ const MonthlyEntries: React.FC = () => {
     } catch (error) {
       console.error('Error fetching entries:', error);
     }
-  };
+  }, [selectedShop]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
 
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 
 const ShopForm: React.FC = () => {
@@ -14,14 +14,7 @@ const ShopForm: React.FC = () => {
     incharge: ''
   });
   const [reportedDates, setReportedDates] = useState<string[]>([]);
-
-
-
-  useEffect(() => {
-    fetchReportedDates();
-  }, [shopId]);
-
-  const fetchReportedDates = async () => {
+  const fetchReportedDates = useCallback(async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/shops/reported-dates/${shopId}`, {
         headers: {
@@ -35,7 +28,11 @@ const ShopForm: React.FC = () => {
     } catch (error) {
       console.error('Error fetching reported dates:', error);
     }
-  };
+  }, [shopId]);
+
+  useEffect(() => {
+    fetchReportedDates();
+  }, [fetchReportedDates]);
 
   const checkExistingReport = (date: string) => {
     // Convert YYYY-MM-DD to DD-MM-YYYY for comparison

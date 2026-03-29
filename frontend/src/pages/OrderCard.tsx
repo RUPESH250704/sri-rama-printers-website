@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../types';
 import { cardsAPI, ordersAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
 
 const OrderCard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,16 +15,9 @@ const OrderCard: React.FC = () => {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (id) {
-      fetchCard();
-    }
-  }, [id]);
-
-  const fetchCard = async () => {
+  const fetchCard = useCallback(async () => {
     try {
       const response = await cardsAPI.getById(id!);
       setCard(response.data);
@@ -35,7 +27,13 @@ const OrderCard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchCard();
+    }
+  }, [id, fetchCard]);
 
   const getDisplayImages = () => {
     if (!card) return [];

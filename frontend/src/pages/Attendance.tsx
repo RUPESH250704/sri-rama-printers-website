@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface Employee {
   _id: string;
@@ -16,21 +16,7 @@ const Attendance: React.FC = () => {
   const [reportToDate, setReportToDate] = useState('');
   const [attendanceData, setAttendanceData] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  useEffect(() => {
-    fetchAttendanceForDate();
-  }, [selectedDate, employees]);
-
-  useEffect(() => {
-    if (reportFromDate && reportToDate) {
-      fetchAttendanceReport();
-    }
-  }, [reportFromDate, reportToDate]);
-
-  const fetchAttendanceReport = async () => {
+  const fetchAttendanceReport = useCallback(async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/attendance/attendance-reports?startDate=${reportFromDate}&endDate=${reportToDate}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -40,7 +26,7 @@ const Attendance: React.FC = () => {
     } catch (error) {
       console.error('Error fetching attendance report:', error);
     }
-  };
+  }, [reportFromDate, reportToDate]);
 
   const calculateStats = () => {
     const stats: { [key: string]: { present: number; absent: number; total: number } } = {};
@@ -65,7 +51,7 @@ const Attendance: React.FC = () => {
     return stats;
   };
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:5000/api/attendance/employees', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -81,9 +67,9 @@ const Attendance: React.FC = () => {
     } catch (error) {
       console.error('Error fetching employees:', error);
     }
-  };
+  }, []);
 
-  const fetchAttendanceForDate = async () => {
+  const fetchAttendanceForDate = useCallback(async () => {
     if (employees.length === 0) return;
     
     try {
@@ -109,7 +95,21 @@ const Attendance: React.FC = () => {
     } catch (error) {
       console.error('Error fetching attendance:', error);
     }
-  };
+  }, [employees, selectedDate]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
+
+  useEffect(() => {
+    fetchAttendanceForDate();
+  }, [fetchAttendanceForDate]);
+
+  useEffect(() => {
+    if (reportFromDate && reportToDate) {
+      fetchAttendanceReport();
+    }
+  }, [reportFromDate, reportToDate, fetchAttendanceReport]);
 
   const handleCheckboxChange = (employeeId: string) => {
     setAttendance(prev => ({
