@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Order } from '../types';
 import { cardsAPI, ordersAPI, servicesAPI, shopsAPI } from '../services/api';
 import ShopCharts from '../components/ShopCharts';
@@ -105,6 +106,7 @@ const CardWithCarousel: React.FC<{card: Card, cardImages: string[], onEdit: () =
 };
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'cards' | 'orders' | 'xerox' | 'performance' | 'attendance'>('cards');
   const [selectedService, setSelectedService] = useState<string>('all');
   const [cards, setCards] = useState<Card[]>([]);
@@ -551,7 +553,7 @@ const AdminDashboard: React.FC = () => {
           Employee Performance
         </button>
         <button
-          onClick={() => window.location.href = '/attendance'}
+          onClick={() => navigate('/attendance')}
           style={{
             padding: '1rem 2rem',
             marginLeft: '1rem',
