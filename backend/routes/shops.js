@@ -75,6 +75,44 @@ router.get('/check-report', auth, async (req, res) => {
   }
 });
 
+// Get entries for a given month/year for a shop
+router.get('/entries/:shopId', auth, async (req, res) => {
+  try {
+    const now = new Date();
+    const requestedMonth = Number(req.query.month || now.getMonth() + 1);
+    const requestedYear = Number(req.query.year || now.getFullYear());
+
+    const month = Math.min(Math.max(requestedMonth, 1), 12);
+    const year = Number.isNaN(requestedYear) ? now.getFullYear() : requestedYear;
+
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+    const reports = await ShopReport.find({
+      shopId: req.params.shopId,
+      reportDate: {
+        $gte: startOfMonth,
+        $lte: endOfMonth
+      }
+    })
+      .select('reportDate incharge')
+      .sort({ reportDate: 1 });
+
+    const entries = reports.map((report) => {
+      const date = new Date(report.reportDate);
+      return {
+        date: date.getDate(),
+        fullDate: date.toISOString().split('T')[0],
+        incharge: report.incharge
+      };
+    });
+
+    res.json({ entries, month, year });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get this month's entries for a shop
 router.get('/this-month-entries/:shopId', auth, async (req, res) => {
   try {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { API_URL, authAPI, shopsAPI } from '../services/api';
 
 const ShopForm: React.FC = () => {
   const { shopId } = useParams();
@@ -14,14 +15,22 @@ const ShopForm: React.FC = () => {
     incharge: ''
   });
   const [reportedDates, setReportedDates] = useState<string[]>([]);
+  const [inchargeOptions, setInchargeOptions] = useState<string[]>([]);
+
+  const fetchInchargeOptions = useCallback(async () => {
+    try {
+      const response = await authAPI.getInchargeOptions();
+      setInchargeOptions(Array.isArray(response.data?.names) ? response.data.names : []);
+    } catch (error) {
+      console.error('Error fetching incharge options:', error);
+      setInchargeOptions([]);
+    }
+  }, []);
+
   const fetchReportedDates = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/shops/reported-dates/${shopId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const response = await shopsAPI.getReportedDates(shopId || '');
+      const data = response.data;
       console.log('Reported dates from API:', data.dates);
       console.log('First few dates:', data.dates.slice(0, 10));
       setReportedDates(data.dates || []);
@@ -33,6 +42,10 @@ const ShopForm: React.FC = () => {
   useEffect(() => {
     fetchReportedDates();
   }, [fetchReportedDates]);
+
+  useEffect(() => {
+    fetchInchargeOptions();
+  }, [fetchInchargeOptions]);
 
   const checkExistingReport = (date: string) => {
     // Convert YYYY-MM-DD to DD-MM-YYYY for comparison
@@ -57,7 +70,7 @@ const ShopForm: React.FC = () => {
     }
     
     try {
-      const response = await fetch('http://localhost:5000/api/shops/report', {
+      const response = await fetch(`${API_URL}/shops/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,12 +172,11 @@ const ShopForm: React.FC = () => {
             style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '4px' }}
           >
             <option value="">Select Incharge</option>
-            <option value="subbu">Subbu</option>
-            <option value="vasanthi">Vasanthi</option>
-            <option value="bhuvana">Bhuvana</option>
-            <option value="mahidhar">Mahidhar</option>
-            <option value="meena">Meena</option>
-            <option value="prasad">Prasad</option>
+            {inchargeOptions.map((name) => (
+              <option key={name} value={name.toLowerCase()}>
+                {name}
+              </option>
+            ))}
           </select>
         </div>
         <div style={{ marginBottom: '1rem' }}>

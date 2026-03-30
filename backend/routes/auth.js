@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Employee = require('../models/Employee');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -63,6 +64,28 @@ router.post('/login', async (req, res) => {
 // Get current user
 router.get('/me', auth, async (req, res) => {
   res.json({ user: { id: req.user._id, name: req.user.name, email: req.user.email, isAdmin: req.user.isAdmin } });
+});
+
+// Get incharge options from actual DB data
+router.get('/incharge-options', auth, async (req, res) => {
+  try {
+    const [users, employees] = await Promise.all([
+      User.find().select('name -_id'),
+      Employee.find({ isActive: { $ne: false } }).select('name -_id')
+    ]);
+
+    const names = Array.from(
+      new Set(
+        [...users, ...employees]
+          .map((item) => (item.name || '').trim())
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    res.json({ names });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = router;

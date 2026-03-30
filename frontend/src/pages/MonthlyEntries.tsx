@@ -2,21 +2,24 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { shopsAPI } from '../services/api';
 
 const MonthlyEntries: React.FC = () => {
+  const now = new Date();
   const [selectedShop, setSelectedShop] = useState('1');
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [entries, setEntries] = useState<any[]>([]);
   const [month, setMonth] = useState(0);
   const [year, setYear] = useState(0);
 
   const fetchEntries = useCallback(async () => {
     try {
-      const response = await shopsAPI.getThisMonthEntries(selectedShop);
+      const response = await shopsAPI.getEntriesByMonth(selectedShop, selectedMonth, selectedYear);
       setEntries(response.data.entries);
       setMonth(response.data.month);
       setYear(response.data.year);
     } catch (error) {
       console.error('Error fetching entries:', error);
     }
-  }, [selectedShop]);
+  }, [selectedShop, selectedMonth, selectedYear]);
 
   useEffect(() => {
     fetchEntries();
@@ -39,6 +42,27 @@ const MonthlyEntries: React.FC = () => {
           <option value="2">Shop 2</option>
           <option value="3">Shop 3</option>
         </select>
+
+        <label style={{ marginLeft: '1.5rem', marginRight: '0.5rem', fontWeight: 'bold' }}>Month:</label>
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+        >
+          {monthNames.map((monthName, index) => (
+            <option key={monthName} value={index + 1}>{monthName}</option>
+          ))}
+        </select>
+
+        <label style={{ marginLeft: '1.5rem', marginRight: '0.5rem', fontWeight: 'bold' }}>Year:</label>
+        <input
+          type="number"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value) || now.getFullYear())}
+          min={2020}
+          max={2100}
+          style={{ width: '90px', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+        />
       </div>
 
       <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
