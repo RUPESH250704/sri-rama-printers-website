@@ -8,7 +8,7 @@ const router = express.Router();
 // Get all employees
 router.get('/employees', auth, async (req, res) => {
   try {
-    const employees = await Employee.find({ isActive: true }).sort({ name: 1 });
+    const employees = await Employee.find({ isActive: { $ne: false } }).sort({ name: 1 });
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -67,7 +67,16 @@ router.post('/attendance', auth, async (req, res) => {
 // Get attendance for a specific date
 router.get('/attendance/:date', auth, async (req, res) => {
   try {
-    const attendance = await Attendance.findOne({ date: new Date(req.params.date) })
+    const inputDate = new Date(req.params.date);
+    const startOfDay = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
+    const endOfDay = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate() + 1);
+
+    const attendance = await Attendance.findOne({
+      date: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    })
       .populate('attendanceRecords.employee')
       .populate('submittedBy', 'name');
     res.json(attendance);
@@ -83,9 +92,14 @@ router.get('/attendance-reports', auth, async (req, res) => {
     const query = {};
     
     if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const startOfDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const endOfDay = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
+
       query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $gte: startOfDay,
+        $lt: endOfDay
       };
     }
     

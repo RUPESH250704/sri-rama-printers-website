@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { API_URL } from '../services/api';
 
 interface Employee {
   _id: string;
@@ -18,7 +19,7 @@ const Attendance: React.FC = () => {
 
   const fetchAttendanceReport = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/attendance/attendance-reports?startDate=${reportFromDate}&endDate=${reportToDate}`, {
+      const response = await fetch(`${API_URL}/attendance/attendance-reports?startDate=${reportFromDate}&endDate=${reportToDate}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -53,7 +54,7 @@ const Attendance: React.FC = () => {
 
   const fetchEmployees = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/attendance/employees', {
+      const response = await fetch(`${API_URL}/attendance/employees`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -73,7 +74,7 @@ const Attendance: React.FC = () => {
     if (employees.length === 0) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/attendance/attendance/${selectedDate}`, {
+      const response = await fetch(`${API_URL}/attendance/attendance/${selectedDate}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -125,7 +126,7 @@ const Attendance: React.FC = () => {
         present: attendance[employeeId]
       }));
 
-      const response = await fetch('http://localhost:5000/api/attendance/attendance', {
+      const response = await fetch(`${API_URL}/attendance/attendance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +152,7 @@ const Attendance: React.FC = () => {
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/attendance/employees', {
+      const response = await fetch(`${API_URL}/attendance/employees`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +178,7 @@ const Attendance: React.FC = () => {
   const handleDeleteEmployee = async (employeeId: string, employeeName: string) => {
     if (window.confirm(`Are you sure you want to remove ${employeeName}?`)) {
       try {
-        const response = await fetch(`http://localhost:5000/api/attendance/employees/${employeeId}`, {
+        const response = await fetch(`${API_URL}/attendance/employees/${employeeId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

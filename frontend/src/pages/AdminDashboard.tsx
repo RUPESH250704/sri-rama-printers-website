@@ -348,13 +348,15 @@ const AdminDashboard: React.FC = () => {
 
   // Helper function to get date range
   const getFilteredReports = () => {
+    const getReportDate = (report: any) => report.reportDate || report.createdAt;
+
     if (dateRangeType === 'single' && selectedDate) {
       return shopReports.filter(report => 
-        new Date(report.createdAt).toDateString() === new Date(selectedDate).toDateString()
+        new Date(getReportDate(report)).toDateString() === new Date(selectedDate).toDateString()
       );
     } else if (dateRangeType === 'range' && fromDate && toDate) {
       return shopReports.filter(report => {
-        const reportDate = new Date(report.createdAt);
+        const reportDate = new Date(getReportDate(report));
         return reportDate >= new Date(fromDate) && reportDate <= new Date(toDate);
       });
     }
@@ -371,7 +373,7 @@ const AdminDashboard: React.FC = () => {
       prevWeekEnd.setDate(prevWeekEnd.getDate() + 6);
       
       return shopReports.filter(report => {
-        const reportDate = new Date(report.createdAt);
+        const reportDate = new Date(report.reportDate || report.createdAt);
         return reportDate >= prevWeekStart && reportDate <= prevWeekEnd;
       });
     }
@@ -1239,7 +1241,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   {getShopFilteredReports(getFilteredReports()).map((report) => (
                     <div key={report._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                      <h5>Shop {report.shopId} - {formatDate(report.createdAt)}</h5>
+                      <h5>Shop {report.shopId} - {formatDate(report.reportDate || report.createdAt)}</h5>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                         <p>B&W Copies: {report.bwCopies}</p>
                         <p>Color Copies: {report.colorCopies}</p>
@@ -1262,7 +1264,7 @@ const AdminDashboard: React.FC = () => {
                     .filter(report => report.shopId === selectedShop.replace('shop', ''))
                     .map((report) => (
                       <div key={report._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-                        <h5>Report Date: {formatDate(report.createdAt)}</h5>
+                        <h5>Report Date: {formatDate(report.reportDate || report.createdAt)}</h5>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                           <p>B&W Copies: {report.bwCopies}</p>
                           <p>Color Copies: {report.colorCopies}</p>
