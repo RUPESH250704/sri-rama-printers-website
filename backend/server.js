@@ -7,6 +7,11 @@ require('dotenv').config();
 
 const app = express();
 
+const getDbDebugInfo = () => ({
+  connected: mongoose.connection.readyState === 1,
+  dbName: mongoose.connection.name || null
+});
+
 const extraAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
@@ -54,14 +59,22 @@ app.use('/api/services', require('./routes/services'));
 app.use('/api/shops', require('./routes/shops'));
 app.use('/api/attendance', require('./routes/attendance'));
 
+// Lightweight health check to verify active DB after deployment.
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    db: getDbDebugInfo()
+  });
+});
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('MongoDB connected');
+    console.log(`MongoDB connected (db: ${mongoose.connection.name || 'unknown'})`);
     // Create admin user on startup
     createAdminUser();
   })
-  .catch(err => console.log(err));
+  .catch(err => console.log('MongoDB connection error:', err.message));
 
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;

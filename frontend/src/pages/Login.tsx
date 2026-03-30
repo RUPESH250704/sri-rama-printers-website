@@ -37,15 +37,16 @@ const Login: React.FC = () => {
       {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: 'bold' }}>Email:</label>
+          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: 'bold' }}>Email or Username:</label>
           <StyledWrapper>
             <label className="search-label">
               <input 
-                type="email" 
+                type="text" 
                 name="email" 
                 className="input" 
                 required 
-                placeholder="Enter your email..." 
+                placeholder="Enter your email or username..." 
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

@@ -1,9 +1,12 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Register - Disabled for production
 router.post('/register', async (req, res) => {
@@ -14,13 +17,39 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    // Find user by email or username
-    const user = await User.findOne({ 
-      $or: [{ email }, { username: email }] 
+    const loginId = (email || '').trim();
+
+    if (!loginId || !password) {
+      return res.status(400).json({ message: 'Email/username and password are required' });
+    }
+
+    const exactMatchRegex = new RegExp(`^${escapeRegex(loginId)}$`, 'i');
+
+    // Find user by email or username (case-insensitive for resilience).
+    const user = await User.findOne({
+      $or: [{ email: exactMatchRegex }, { username: exactMatchRegex }]
     });
-    
-    if (!user || !(await user.comparePassword(password))) {
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    let isValidPassword = false;
+    try {
+      isValidPassword = await user.comparePassword(password);
+    } catch (error) {
+      isValidPassword = false;
+    }
+
+    // Legacy compatibility: if old records stored plain text, allow one-time login
+    // and immediately migrate stored password to a bcrypt hash.
+    if (!isValidPassword && user.password === password) {
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+      isValidPassword = true;
+    }
+
+    if (!isValidPassword) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
