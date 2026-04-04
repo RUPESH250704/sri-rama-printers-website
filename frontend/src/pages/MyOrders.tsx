@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Order } from '../types';
-import { ordersAPI } from '../services/api';
+import { getUploadUrl, ordersAPI } from '../services/api';
 
 const MyOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -45,7 +45,7 @@ const MyOrders: React.FC = () => {
             <div key={order._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem', backgroundColor: 'white' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '1rem', alignItems: 'center' }}>
                 <img
-                  src={`http://localhost:5000/uploads/${order.card.image}`}
+                  src={getUploadUrl(order.card.image)}
                   alt={order.card.name}
                   style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }}
                 />

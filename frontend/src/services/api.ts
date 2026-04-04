@@ -6,6 +6,13 @@ const defaultApiUrl = process.env.NODE_ENV === 'production'
   : 'http://localhost:5000/api';
 
 export const API_URL = (configuredApiUrl || defaultApiUrl).replace(/\/$/, '');
+export const UPLOAD_BASE_URL = API_URL.replace(/\/api$/, '');
+
+export const getUploadUrl = (fileName?: string) => {
+  if (!fileName) return '';
+  const normalized = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+  return `${UPLOAD_BASE_URL}/uploads/${normalized}`;
+};
 
 const api = axios.create({
   baseURL: API_URL,

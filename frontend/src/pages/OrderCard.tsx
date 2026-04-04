@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../types';
-import { cardsAPI, ordersAPI } from '../services/api';
+import { cardsAPI, getUploadUrl, ordersAPI } from '../services/api';
 
 const OrderCard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -87,7 +87,7 @@ const OrderCard: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
         <div style={{ position: 'relative' }}>
           <img
-            src={`http://localhost:5000/uploads/${getDisplayImages()[currentImageIndex]}`}
+            src={getUploadUrl(getDisplayImages()[currentImageIndex])}
             alt={card.name}
             style={{ width: '100%', borderRadius: '8px' }}
           />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Order } from '../types';
-import { cardsAPI, ordersAPI, servicesAPI, shopsAPI } from '../services/api';
+import { cardsAPI, getUploadUrl, ordersAPI, servicesAPI, shopsAPI } from '../services/api';
 import ShopCharts from '../components/ShopCharts';
 
 const CardWithCarousel: React.FC<{card: Card, cardImages: string[], onEdit: () => void, onDelete: () => void}> = ({ card, cardImages, onEdit, onDelete }) => {
@@ -11,7 +11,7 @@ const CardWithCarousel: React.FC<{card: Card, cardImages: string[], onEdit: () =
     <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', position: 'relative' }}>
       <div style={{ position: 'relative' }}>
         <img
-          src={`http://localhost:5000/uploads/${cardImages[currentImageIndex]}`}
+          src={getUploadUrl(cardImages[currentImageIndex])}
           alt={card.name}
           style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px' }}
         />
@@ -956,7 +956,7 @@ const AdminDashboard: React.FC = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr 1fr', gap: '1rem', alignItems: 'center' }}>
                     <div>
                       <img
-                        src={`http://localhost:5000/uploads/${order.card.image}`}
+                        src={getUploadUrl(order.card.image)}
                         alt={order.card.name}
                         style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
                       />

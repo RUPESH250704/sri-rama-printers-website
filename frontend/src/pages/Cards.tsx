@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../types';
-import { cardsAPI } from '../services/api';
+import { cardsAPI, getUploadUrl } from '../services/api';
 
 const Cards: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
@@ -79,7 +79,7 @@ const Cards: React.FC = () => {
         {filteredCards.map((card) => (
           <div key={card._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: 'white' }}>
             <img
-              src={`http://localhost:5000/uploads/${card.image}`}
+              src={getUploadUrl(card.image)}
               alt={card.name}
               style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '4px' }}
             />
