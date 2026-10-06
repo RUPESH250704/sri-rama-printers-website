@@ -1,158 +1,169 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import styled from 'styled-components';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [pin, setPin] = useState(['', '', '', '']);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [shake, setShake] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { unlock } = useAuth();
   const navigate = useNavigate();
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      navigate('/');
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Login failed');
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
+
+  const handleChange = (index: number, value: string) => {
+    if (!/^\d?$/.test(value)) return;
+    const newPin = [...pin];
+    newPin[index] = value;
+    setPin(newPin);
+    setError('');
+
+    if (value && index < 3) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-submit when all 4 digits filled
+    if (value && index === 3) {
+      const fullPin = [...newPin.slice(0, 3), value].join('');
+      if (fullPin.length === 4) submitPin(fullPin);
     }
   };
 
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !pin[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const submitPin = async (fullPin: string) => {
+    if (submitting) return;
+    setSubmitting(true);
+    const success = await unlock(fullPin);
+    setSubmitting(false);
+    if (success) {
+      navigate('/');
+    } else {
+      setShake(true);
+      setError('Incorrect PIN');
+      setPin(['', '', '', '']);
+      setTimeout(() => {
+        setShake(false);
+        inputRefs.current[0]?.focus();
+      }, 600);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitPin(pin.join(''));
+  };
+
   return (
-    <div style={{ 
-      height: '100vh', 
-      backgroundImage: 'url("/sri-rama.jpg")', 
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center', 
-      backgroundRepeat: 'no-repeat',
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      overflow: 'hidden'
     }}>
-    <div style={{ maxWidth: '500px', width: '90%', padding: '3rem', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(15px)' }}>
-      <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>LOGIN</h2>
-      {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: 'bold' }}>Email or Username:</label>
-          <StyledWrapper>
-            <label className="search-label">
-              <input 
-                type="text" 
-                name="email" 
-                className="input" 
-                required 
-                placeholder="Enter your email or username..." 
-                autoComplete="username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <kbd className="slash-icon">@</kbd>
-            </label>
-          </StyledWrapper>
-        </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: 'bold' }}>Password:</label>
-          <StyledWrapper>
-            <label className="search-label">
-              <input 
-                type="password" 
-                name="password" 
-                className="input" 
-                required 
-                placeholder="Enter your password..." 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <kbd className="slash-icon">🔒</kbd>
-            </label>
-          </StyledWrapper>
-        </div>
-        <button 
-          type="submit" 
-          style={{ width: '100%', padding: '0.75rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', transition: 'all 0.3s ease' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#0056b3';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#007bff';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          Login
-        </button>
-      </form>
+      <div style={{
+        backgroundColor: 'rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(16px)',
+        borderRadius: '16px',
+        padding: '2.5rem 2rem',
+        width: '90%',
+        maxWidth: '340px',
+        textAlign: 'center',
+        border: '1px solid rgba(255,255,255,0.12)',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+      }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔐</div>
+        <h2 style={{ color: '#fff', marginBottom: '0.25rem', fontSize: '1.4rem', fontWeight: 'bold' }}>
+          Sri Rama Prints
+        </h2>
+        <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '2rem', fontSize: '0.9rem' }}>
+          Enter your 4-digit PIN
+        </p>
 
-    </div>
+        <form onSubmit={handleSubmit}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '0.75rem',
+              justifyContent: 'center',
+              marginBottom: '1.5rem',
+              animation: shake ? 'shake 0.5s ease' : 'none',
+            }}
+          >
+            {pin.map((digit, i) => (
+              <input
+                key={i}
+                ref={el => { inputRefs.current[i] = el; }}
+                type="password"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={e => handleChange(i, e.target.value)}
+                onKeyDown={e => handleKeyDown(i, e)}
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  textAlign: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  border: `2px solid ${error ? '#ff6b6b' : digit ? '#fff' : 'rgba(255,255,255,0.4)'}`,
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  color: '#fff',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+              />
+            ))}
+          </div>
+
+          {error && (
+            <p style={{ color: '#ff6b6b', marginBottom: '1rem', fontSize: '0.9rem', fontWeight: 'bold' }}>
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={pin.join('').length < 4 || submitting}
+            style={{
+              width: '100%',
+              padding: '0.85rem',
+              backgroundColor: pin.join('').length === 4 && !submitting ? '#007bff' : 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              cursor: pin.join('').length === 4 && !submitting ? 'pointer' : 'not-allowed',
+              transition: 'background-color 0.2s',
+            }}
+          >
+            {submitting ? 'Unlocking...' : 'Unlock'}
+          </button>
+        </form>
+      </div>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-8px); }
+          80% { transform: translateX(8px); }
+        }
+      `}</style>
     </div>
   );
 };
-
-const StyledWrapper = styled.div`
-  .search-label {
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    position: relative;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #3D3D3D;
-    padding: 9px;
-    cursor: text;
-  }
-
-  .search-label:hover {
-    border-color: gray;
-  }
-
-  .search-label:focus-within {
-    background: #464646;
-    border-color: gray;
-  }
-
-  .search-label input {
-    outline: none;
-    width: 100%;
-    border: none;
-    background: none;
-    color: rgb(162, 162, 162);
-  }
-
-  .search-label input:focus+.slash-icon,
-  .search-label input:valid+.slash-icon {
-    display: none;
-  }
-
-  .search-label svg,
-  .slash-icon {
-    position: absolute;
-    color: #7e7e7e;
-  }
-
-  .slash-icon {
-    right: 7px;
-    border: 1px solid #393838;
-    background: linear-gradient(-225deg, #343434, #6d6d6d);
-    border-radius: 3px;
-    text-align: center;
-    box-shadow: inset 0 -2px 0 0 #3f3f3f, inset 0 0 1px 1px rgb(94, 93, 93), 0 1px 2px 1px rgba(28, 28, 29, 0.4);
-    cursor: pointer;
-    font-size: 12px;
-    width: 15px;
-  }
-
-  .slash-icon:active {
-    box-shadow: inset 0 1px 0 0 #3f3f3f, inset 0 0 1px 1px rgb(94, 93, 93), 0 1px 2px 0 rgba(28, 28, 29, 0.4);
-    text-shadow: 0 1px 0 #7e7e7e;
-    color: transparent;
-  }
-`;
 
 export default Login;

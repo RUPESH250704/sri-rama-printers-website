@@ -28,11 +28,11 @@ const MonthlyEntries: React.FC = () => {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+    <div className="page-container" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h2>Monthly Entries - {monthNames[month - 1]} {year}</h2>
       
-      <div style={{ marginBottom: '2rem' }}>
-        <label style={{ marginRight: '1rem', fontWeight: 'bold' }}>Select Shop:</label>
+      <div className="monthly-filters">
+        <label style={{ fontWeight: 'bold' }}>Select Shop:</label>
         <select 
           value={selectedShop} 
           onChange={(e) => setSelectedShop(e.target.value)}
@@ -43,7 +43,7 @@ const MonthlyEntries: React.FC = () => {
           <option value="3">Shop 3</option>
         </select>
 
-        <label style={{ marginLeft: '1.5rem', marginRight: '0.5rem', fontWeight: 'bold' }}>Month:</label>
+        <label style={{ fontWeight: 'bold' }}>Month:</label>
         <select
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(Number(e.target.value))}
@@ -54,7 +54,7 @@ const MonthlyEntries: React.FC = () => {
           ))}
         </select>
 
-        <label style={{ marginLeft: '1.5rem', marginRight: '0.5rem', fontWeight: 'bold' }}>Year:</label>
+        <label style={{ fontWeight: 'bold' }}>Year:</label>
         <input
           type="number"
           value={selectedYear}

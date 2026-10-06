@@ -1,0 +1,264 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* ── Navbar ── */
+.navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.navbar-brand {
+  font-size: 1.2rem !important;
+  white-space: nowrap;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.navbar-actions span {
+  font-size: 0.85rem;
+}
+
+/* ── Home page big buttons ── */
+.home-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.home-btn {
+  padding: 2rem !important;
+  font-size: 1.3rem !important;
+  min-width: unset !important;
+  flex: 1 1 140px;
+  max-width: 260px;
+}
+
+/* ── SriRamaPrints / Xerox grid buttons ── */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.service-btn {
+  padding: 1.5rem 1rem !important;
+  font-size: 1rem !important;
+}
+
+/* ── Admin Dashboard tabs ── */
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-tab-btn {
+  padding: 0.6rem 1rem !important;
+  font-size: 0.85rem !important;
+  margin: 0 !important;
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+
+/* ── Admin add-card grid ── */
+.admin-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Order row in admin ── */
+.order-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ── MyOrders row ── */
+.my-order-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ── OrderCard layout ── */
+.order-card-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* ── MonthlyEntries filters ── */
+.monthly-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* ── Attendance header ── */
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Shop report grid ── */
+.shop-report-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* ── Performance cards ── */
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ════════════════════════════════
+   MOBILE  (≤ 600px)
+════════════════════════════════ */
+@media (max-width: 600px) {
+  /* Navbar */
+  .navbar-brand {
+    font-size: 1rem !important;
+  }
+
+  .navbar-actions span {
+    display: none; /* hide "Welcome, name" on very small screens */
+  }
+
+  /* Home */
+  .home-btn {
+    padding: 1.5rem 1rem !important;
+    font-size: 1.1rem !important;
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  /* Service pages */
+  .service-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .service-btn {
+    padding: 1.2rem 0.5rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Admin tabs — scroll horizontally */
+  .admin-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+  }
+
+  .admin-tab-btn {
+    flex-shrink: 0;
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  /* Admin forms */
+  .admin-form-grid-2,
+  .admin-form-grid-3,
+  .admin-form-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Order rows */
+  .order-row {
+    grid-template-columns: 1fr;
+  }
+
+  .my-order-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* OrderCard */
+  .order-card-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Shop report */
+  .shop-report-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* General padding reduction */
+  .page-container {
+    padding: 1rem !important;
+  }
+
+  /* Forms */
+  .form-container {
+    padding: 1.25rem !important;
+  }
+
+  h1.page-title {
+    font-size: 1.8rem !important;
+  }
+
+  h2.page-title {
+    font-size: 1.4rem !important;
+  }
+}
+
+/* ════════════════════════════════
+   SMALL MOBILE  (≤ 400px)
+════════════════════════════════ */
+@media (max-width: 400px) {
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-btn {
+    font-size: 1rem !important;
+  }
+}

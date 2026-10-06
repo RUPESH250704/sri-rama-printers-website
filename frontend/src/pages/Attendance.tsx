@@ -204,13 +204,13 @@ const Attendance: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+    <div className="page-container" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '2rem', color: '#333' }}>
         Employee Attendance
       </h1>
 
       <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div className="attendance-header">
           <div>
             <label style={{ fontWeight: 'bold', marginRight: '1rem' }}>Select Date:</label>
             <input
@@ -257,7 +257,7 @@ const Attendance: React.FC = () => {
           <div style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px', border: '1px solid #ddd' }}>
             <h3 style={{ marginBottom: '1.5rem' }}>Attendance Report Analysis</h3>
             <div>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
                   <label style={{ fontWeight: 'bold', marginRight: '0.5rem' }}>From:</label>
                   <input

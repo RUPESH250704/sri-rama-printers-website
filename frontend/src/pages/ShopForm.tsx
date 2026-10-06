@@ -110,12 +110,12 @@ const ShopForm: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="page-container" style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '2rem', color: '#333' }}>
         Shop {shopId} - Daily Report
       </h1>
       
-      <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+      <form onSubmit={handleSubmit} className="form-container" style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
         {checkExistingReport(formData.reportDate) ? (
           <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#d4edda', borderRadius: '8px', border: '2px solid #28a745' }}>
             <h2 style={{ color: '#28a745', marginBottom: '1rem' }}>✓ Entry Done</h2>

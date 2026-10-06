@@ -1,8 +1,7 @@
 export interface User {
-  id: string;
   name: string;
-  email: string;
   isAdmin: boolean;
+  email: string;
 }
 
 export interface Card {

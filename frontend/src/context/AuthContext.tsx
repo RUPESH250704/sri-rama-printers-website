@@ -1,47 +1,63 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
-import { authAPI } from '../services/api';
+import api from '../services/api';
+
+const ADMIN_PIN = process.env.REACT_APP_ADMIN_PIN || '1234';
+const BACKEND_EMAIL = process.env.REACT_APP_ADMIN_EMAIL || '';
+const BACKEND_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || '';
+const STORAGE_KEY = 'pin_unlocked';
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  isUnlocked: boolean;
+  unlock: (pin: string) => Promise<boolean>;
+  lock: () => void;
   loading: boolean;
+  user: { name: string; isAdmin: boolean; email: string } | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
     const token = localStorage.getItem('token');
-    if (token) {
-      authAPI.getMe()
-        .then(response => setUser(response.data.user))
-        .catch(() => localStorage.removeItem('token'))
-        .finally(() => setLoading(false));
+    if (saved === 'true' && token) {
+      setIsUnlocked(true);
     } else {
-      setLoading(false);
+      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('token');
     }
+    setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await authAPI.login({ email, password });
-    localStorage.setItem('token', response.data.token);
-    setUser(response.data.user);
+  const unlock = async (pin: string): Promise<boolean> => {
+    if (pin !== ADMIN_PIN) return false;
+    try {
+      const response = await api.post('/auth/login', {
+        email: BACKEND_EMAIL,
+        password: BACKEND_PASSWORD,
+      });
+      localStorage.setItem('token', response.data.token);
+      setIsUnlocked(true);
+      sessionStorage.setItem(STORAGE_KEY, 'true');
+      return true;
+    } catch {
+      return false;
+    }
   };
 
-
-
-  const logout = () => {
+  const lock = () => {
+    setIsUnlocked(false);
+    sessionStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('token');
-    setUser(null);
   };
+
+  const user = isUnlocked ? { name: 'Admin', isAdmin: true, email: '' } : null;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ isUnlocked, unlock, lock, loading, user }}>
       {children}
     </AuthContext.Provider>
   );
@@ -49,8 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 };

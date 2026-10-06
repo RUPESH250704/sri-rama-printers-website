@@ -1,77 +1,56 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 const createAdminUser = require('./createAdmin');
 require('dotenv').config();
 
 const app = express();
 
-const getDbDebugInfo = () => ({
-  connected: mongoose.connection.readyState === 1,
-  dbName: mongoose.connection.name || null
-});
-
 const extraAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((o) => o.trim())
   .filter(Boolean);
 
 const isAllowedVercelOrigin = (origin) => {
   try {
     const parsed = new URL(origin);
     return parsed.protocol === 'https:' && parsed.hostname.endsWith('.vercel.app');
-  } catch (error) {
+  } catch {
     return false;
   }
 };
 
-// Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) {
+    if (!origin) return callback(null, true);
+    const isDev = process.env.NODE_ENV !== 'production';
+    if (isDev && ['http://localhost:3000', 'http://127.0.0.1:3000'].includes(origin)) {
       return callback(null, true);
     }
-
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-    const devOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
-
-    if (isDevelopment && devOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
     if (extraAllowedOrigins.includes(origin) || isAllowedVercelOrigin(origin)) {
       return callback(null, true);
     }
-
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/cards', require('./routes/cards'));
-app.use('/api/orders', require('./routes/orders'));
-app.use('/api/services', require('./routes/services'));
 app.use('/api/shops', require('./routes/shops'));
 app.use('/api/attendance', require('./routes/attendance'));
 
-// Lightweight health check to verify active DB after deployment.
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    db: getDbDebugInfo()
+    db: { connected: mongoose.connection.readyState === 1, dbName: mongoose.connection.name || null }
   });
 });
 
-// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log(`MongoDB connected (db: ${mongoose.connection.name || 'unknown'})`);
-    // Create admin user on startup
+    console.log(`MongoDB connected (db: ${mongoose.connection.name})`);
     createAdminUser();
   })
   .catch(err => console.log('MongoDB connection error:', err.message));
