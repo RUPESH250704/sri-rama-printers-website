@@ -103,8 +103,9 @@ const Login: React.FC = () => {
               <input
                 key={i}
                 ref={el => { inputRefs.current[i] = el; }}
-                type="password"
+                type="tel"
                 inputMode="numeric"
+                pattern="[0-9]*"
                 maxLength={1}
                 value={digit}
                 onChange={e => handleChange(i, e.target.value)}
@@ -121,6 +122,7 @@ const Login: React.FC = () => {
                   color: '#fff',
                   outline: 'none',
                   transition: 'border-color 0.2s',
+                  WebkitTextSecurity: 'disc' as any,
                 }}
               />
             ))}

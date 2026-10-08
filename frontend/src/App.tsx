@@ -20,7 +20,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa', paddingTop: '56px' }}>
           <Navbar />
           <Routes>
             <Route path="/" element={<ProtectedRoute><Xerox /></ProtectedRoute>} />

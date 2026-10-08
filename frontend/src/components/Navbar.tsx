@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav style={{ padding: '0.75rem 1rem', backgroundColor: '#000000', borderBottom: '1px solid #dee2e6' }}>
+    <nav style={{ padding: '0.75rem 1rem', backgroundColor: '#000000', borderBottom: '1px solid #dee2e6', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
       <div className="navbar-inner">
         <Link to="/" className="navbar-brand" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: '#ffffff' }}>
           Sri Rama Prints
