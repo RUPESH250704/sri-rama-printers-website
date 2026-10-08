@@ -110,19 +110,9 @@ const Login: React.FC = () => {
                 value={digit}
                 onChange={e => handleChange(i, e.target.value)}
                 onKeyDown={e => handleKeyDown(i, e)}
+                className="pin-input"
                 style={{
-                  width: '56px',
-                  height: '56px',
-                  textAlign: 'center',
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
                   border: `2px solid ${error ? '#ff6b6b' : digit ? '#fff' : 'rgba(255,255,255,0.4)'}`,
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  color: '#fff',
-                  outline: 'none',
-                  transition: 'border-color 0.2s',
-                  WebkitTextSecurity: 'disc' as any,
                 }}
               />
             ))}
@@ -162,6 +152,19 @@ const Login: React.FC = () => {
           40% { transform: translateX(8px); }
           60% { transform: translateX(-8px); }
           80% { transform: translateX(8px); }
+        }
+        .pin-input {
+          width: 56px;
+          height: 56px;
+          text-align: center;
+          font-size: 1.5rem;
+          font-weight: bold;
+          border-radius: 12px;
+          background-color: rgba(255,255,255,0.15);
+          color: #fff;
+          outline: none;
+          transition: border-color 0.2s;
+          -webkit-text-security: disc;
         }
       `}</style>
     </div>
